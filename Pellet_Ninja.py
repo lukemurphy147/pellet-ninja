@@ -124,14 +124,15 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         """ Called when user hits 'jump' button. """
 
-        # Move down a pixel and see if there is a tile below us.
-        self.rect.y += 1
+        # Move down two pixels and see if there is a tile below us.
+        # (One pixel isn't enough if we're on a moving platform going down.)
+        self.rect.y += 2
         tile_hit_list = pygame.sprite.spritecollide(self, self.room.tile_list, False)
-        self.rect.y -= 1
+        self.rect.y -= 2
 
         # If it is ok to jump, set our speed upwards
         if len(tile_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT:
-            self.change_y = -10
+            self.change_y = -11
 
     # Player-controlled movement:
     def go_left(self):
@@ -145,7 +146,6 @@ class Player(pygame.sprite.Sprite):
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
-
 
 
 class Tile(pygame.sprite.Sprite):
@@ -218,7 +218,7 @@ class MovingPlatform(Tile):
         # Move up/down
         self.rect.y += self.change_y
 
-        # Check and see if we the player
+        # See if we hit the player
         hit = pygame.sprite.collide_rect(self, self.player)
         if hit:
             # We did hit the player. Shove the player around and
@@ -238,6 +238,7 @@ class MovingPlatform(Tile):
         if self.rect.x < self.boundary_left or self.rect.x > self.boundary_right:
             self.change_x *= -1
 
+
 class Enemy(Tile):
     """Moving platform that damages on touch and disappears when shot"""
     change_x = 0
@@ -256,9 +257,6 @@ class Enemy(Tile):
     flipFlag2 = False
     pellet_list = pygame.sprite.Group()
     player = None
-
-
-
     room = None
 
     def update(self):
@@ -289,7 +287,6 @@ class Enemy(Tile):
                 self.image = pygame.transform.flip(self.image, True, False)
                 self.flipFlag2 = False
                 self.flipFlag1 = False
-
 
         self.rect.x += self.change_x
 
@@ -363,8 +360,6 @@ class Boss(Enemy):
         return pel
 
 
-
-
 class Door(pygame.sprite.Sprite):
     """ The player reaches the unlocked door to advance to
         the next room. """
@@ -402,7 +397,7 @@ class Room(object):
 
         # Background image
         self.background = pygame.Surface([1200, 720])
-        self.background.fill((4, 234, 220))
+        self.background.fill((100, 200, 255))
 
     # Update everything on this room
     def update(self):
@@ -412,6 +407,7 @@ class Room(object):
         self.enemy_list.update()
 
         self.object_list.update()
+
     def draw(self, screen):
         """ Draw everything on this room. """
 
@@ -457,7 +453,6 @@ class Room_1_1(Room):
         y = 0
         for layer in game_map:
             x = 0
-
             for num in layer:
                 if num != 0:
                     if num == 1:
@@ -473,7 +468,6 @@ class Room_1_1(Room):
                     block.rect.x, block.rect.y = x * 48, y * 48
                     block.player = self.player
                     self.tile_list.add(block)
-
                 x += 1
             y += 1
 
@@ -495,6 +489,7 @@ class Room_1_1(Room):
         block_1.image = pygame.transform.flip(block_1.image, True, False)
         self.enemy_list.add(block_1)
 
+
 # Create tiles for the room
 class Room_2_1(Room):
     """ Definition for room 2. """
@@ -512,11 +507,11 @@ class Room_2_1(Room):
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 3],
-            [5, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
-            [5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
-            [5, 4, 4, 0, 0, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
+            [1, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
+            [1, 1, 1, 0, 0, 0, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-            [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+            [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
@@ -550,7 +545,7 @@ class Room_2_1(Room):
         block_1.rect.x = 700
         block_1.rect.y = 550
         block_1.boundary_left = 700
-        block_1.boundary_right = 1000
+        block_1.boundary_right = 900
         block_1.change_x = 1
         block_1.player = self.player
         block_1.room = self
@@ -561,9 +556,9 @@ class Room_2_1(Room):
         # Add a custom moving platform
         block_2 = MovingPlatform(plat_img)
         block_2.rect.x = 1100
-        block_2.rect.y = 400
-        block_2.boundary_top = 250
-        block_2.boundary_bottom = 500
+        block_2.rect.y = 300
+        block_2.boundary_top = 150
+        block_2.boundary_bottom = 400
         block_2.change_y = 1
         block_2.player = self.player
         block_2.room = self
@@ -601,11 +596,11 @@ class Room_Boss(Room):
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-            [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+            [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 3],
             [5, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
             [5, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-            [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+            [1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
         ]
 
         # Go through the array above and add tiles
@@ -649,6 +644,7 @@ class Room_Boss(Room):
         self.boss = boss
         self.enemy_list.add(boss)
 
+
 class Button():
 
     def __init__(self, color, x, y, width, height, text=''):
@@ -667,7 +663,7 @@ class Button():
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), 0)
 
         if self.text != '':
-            font = pygame.font.SysFont('comicsans', font_size)
+            font = pygame.font.SysFont('microsoftsansserif', font_size)
             text = font.render(self.text, 1, (0, 0, 0))
             screen.blit(text, (
             self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
@@ -686,9 +682,9 @@ def main():
 
     # Set the height and width of the screen
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, flags = pygame.SCALED, vsync = 1)
 
-    pygame.display.set_caption("Pellet Knight")
+    pygame.display.set_caption("Pellet Ninja")
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -721,14 +717,16 @@ def main():
     level_list = [[Room_1_1(player)], [Room_2_1(player)],[Room_Boss(player)]]
 
     # Define the buttons to be loaded later
-    Title = Button((128, 255, 128), 275, 100, 600, 200, "Pellet Ninja")
-    Button_1 = Button((128, 255, 128), 300, 420, 150, 150, "Level 1")
-    Button_2 = Button((128, 255, 128), 500, 420, 150, 150, "Level 2")
-    Button_3 = Button((128, 255, 128),700,420,150,150, "Boss")
-    Game_Over = Button((128, 255, 128), 275, 100, 600, 200, "Pellet Ninja Slain!")
-    Try_again = Button((128, 255, 128),330,320,500,100, "Try_Again?")
-    Warning = Button((128, 255, 128), 275, 620, 600, 50, "Don't touch enemies or be shot 3 times!")
+    Title = Button((255, 255, 255), 225, 75, 700, 200, "Pellet Ninja")
+    Button_1 = Button((128, 255, 128), 300, 375, 150, 150, "Lvl 1")
+    Button_2 = Button((128, 255, 128), 500, 375, 150, 150, "Lvl 2")
+    Button_3 = Button((128, 255, 128), 700, 375, 150, 150, "Boss")
+    Warning = Button((255, 255, 255), 200, 600, 750, 75, "Don't touch enemies or be shot 3 times!")
+    Game_Over = Button((255, 255, 255), 325, 175, 500, 150, "GAME OVER")
+    Try_again = Button((128, 255, 128), 375, 450, 400, 100, "Back to menu")
+
     died = False
+
     # Start the game
     while True:
 
@@ -789,7 +787,6 @@ def main():
         pellet_list = pygame.sprite.Group()
         enemy_pellet_list = pygame.sprite.Group()
 
-
         current_room.key.rect.x, current_room.key.rect.y = current_room.key.x, current_room.key.y
         current_room.door.image = current_room.door.closed_image
 
@@ -801,13 +798,10 @@ def main():
                 if len(current_room.enemy_list) == 0:
                     current_room.door.image = current_room.door.open_image
 
-
-
             for pellet in pellet_list:
                 shouldDel = pellet.move(current_room.tile_list, current_room.enemy_list, "p")
                 if shouldDel:
                     del pellet
-
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -827,7 +821,7 @@ def main():
                     if event.key == pygame.K_UP:
                         player.jump()
                     if event.key == pygame.K_SPACE:
-                        if len(pellet_list.sprites()) < 5:
+                        if len(pellet_list.sprites()) < 1:
                             pellet_list.add(
                                 Pellet(player.rect.x + (40 * player.facing) + 7, player.rect.y + 12, player.facing, "pellet"))
 
@@ -885,7 +879,6 @@ def main():
                     if shouldDel:
                         del pellet
                 enemy.pellet_list.draw(screen)
-
             # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
 
             # Limit to 60 frames per second
@@ -895,12 +888,13 @@ def main():
             pygame.display.flip()
 
         # Restore the room so enemies come back if the level is replayed
+        for enemy in current_room.enemy_list:
+            enemy.kill()
         current_room.restore()
+
     # Be IDLE friendly. If you forget this line, the program will 'hang'
     # on exit.
     pygame.quit()
-
-
 
 
 if __name__ == "__main__":
