@@ -1,2 +1,2 @@
 # pellet-ninja
-A remake of a Mega Man clone I worked on as a group project in college. "2020 version" contains exactly the files my group and I submitted back then.
+A remake of a Mega Man clone I worked on as a group project in college. The folder "2020 version" contains exactly the files my group and I submitted back then, written for Pygame 2.1.2 and following [DaFluffyPotato](https://www.youtube.com/@DaFluffyPotato/videos)'s then-latest tutorial. My contributions were half of the concept (the idea to riff on Mega Man, but not the idea to use a ninja) and writing "Pellet_Ninja.py" (minus what I borrowed from the tutorial). Everything outside "2020 version" is my solo effort on top of the old version, written for Pygame-ce 2.5.0.
